@@ -17,13 +17,17 @@ public class Client {
 			while(socket == null) {
 				try {
 					socket = new Socket(ip, PORT);
-				}catch(Exception ex) {} //This is inside a loop, so we don't want to infinitely print errors
-			}
-			System.out.println("INFO: Connected!");
-			
-			InputThread it = new InputThread(socket);
-			it.start();
-			
+					System.out.println("INFO: Connected!");
+					InputThread it = new InputThread(socket);
+					it.start();
+					isConnected ic = new isConnected(socket);
+					ic.start();
+				}catch(Exception ex) {
+					socket = null;
+					System.out.println("WARN: Server did not respond, trying again in 5 seconds...");
+					Thread.sleep(5000);
+				} //This is inside a loop, so we don't want to infinitely print errors
+			}			
 		}catch(Exception ex) {
 			socket = null;
 			System.gc();
@@ -31,6 +35,34 @@ public class Client {
 		}
 	}
 	
+	public void closeConnectionsAndRestart() {
+		start();
+	}
+	
+	class isConnected extends Thread {
+		Socket socket;
+		ObjectOutputStream sOutput;
+		
+		public isConnected(Socket theSocket) {
+			socket = theSocket;
+			try {
+				sOutput = new ObjectOutputStream(socket.getOutputStream());
+			}catch(Exception ex) {};
+		}
+		
+		@SuppressWarnings("deprecation")
+		public void run() {
+			while(true) {
+				try {
+					sOutput.writeObject("!!!test_packet!!!");
+					sOutput.flush();
+				}catch(Exception ex) {
+					System.out.println("WARN: Server has disconnected! Attempting to reconnect...");
+					this.stop();
+				}
+			}
+		}
+	}
 	
 	class InputThread extends Thread {
 		Socket socket;
