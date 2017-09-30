@@ -64,7 +64,10 @@ public class Server {
 			}
 		}else if(command.startsWith("execute")) {
 			for(ClientThread cl : clientThreads) {
-				cl.sendInstruction(command);
+				if(!cl.sendInstruction(command)) {
+					clientThreads.remove(cl);
+					numberOfClients--;
+				}
 			}
 			System.out.println("INFO: Sent Message");
 		}
@@ -75,7 +78,7 @@ public class Server {
 		while(numberOfClients < maxClients) {
 			try {
 				Socket newSocket = serverSocket.accept();
-				System.out.println("\nINFO: New Client connected at "+newSocket.getInetAddress().toString());
+				System.out.println("INFO: New Client connected at "+newSocket.getInetAddress().toString());
 				clientSockets.add(newSocket);
 				ClientThread cl = new ClientThread(newSocket);
 				cl.start();
@@ -105,11 +108,15 @@ public class Server {
 			}catch(Exception ex) {ex.printStackTrace();}
 		}
 		
-		public void sendInstruction(String command) {
+		public boolean sendInstruction(String command) {
 			try {
 				sOutput.writeObject("COMMAND: " + command);
 				sOutput.flush();
-			}catch(Exception ex) {ex.printStackTrace();}
+				return true;
+			}catch(Exception ex) {
+				System.out.println("WARN: A Client has disconnected!");
+				return false;
+			}
 		}
 	}
 	
