@@ -7,7 +7,7 @@ import java.util.Random;
 public class Client {
 	
 	private int PORT = 65530;
-	private String ip = "199.116.235.171"; // Change this value to your server and compile it into a Jar
+	private String ip = "127.0.0.1"; // Change this value to your server and compile it into a Jar
 	private Socket socket;
 	
 	private void start() {

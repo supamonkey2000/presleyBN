@@ -53,9 +53,9 @@ public class Server {
 				for(ClientThread cl : clientThreads) {
 					try {
 						cl.socket.close();
+						numberOfClients--;
+						clientThreads.remove(cl);
 					}catch(Exception ex) {}
-					clientThreads.remove(cl);
-					numberOfClients--;
 				}
 				System.out.println("INFO: Closed all connections");
 				System.exit(0);
@@ -65,7 +65,9 @@ public class Server {
 		}else if(command.startsWith("execute")) {
 			for(ClientThread cl : clientThreads) {
 				if(!cl.sendInstruction(command)) {
-					clientThreads.remove(cl);
+					try {
+						clientThreads.remove(cl);
+					}catch(Exception ex){};
 					numberOfClients--;
 				}
 			}
